@@ -16,6 +16,23 @@ spring:
       base-url: http://localhost:11434
       chat:
         model: qwen2.5:7b
+  datasource:
+    url: jdbc:oracle:thin:@//localhost:1521/XEPDB1
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 30000
+
+    jpa:
+      hibernate:
+        ddl-auto: none          # table already exists; don't let Hibernate change it
+      open-in-view: false       # don't hold DB connections for the whole HTTP request
+      show-sql: true            # print SQL to the console (demo only)
+      properties:
+        hibernate:
+          format_sql: true
 
 
 logging:
