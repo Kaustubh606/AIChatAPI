@@ -1,6 +1,7 @@
 package com.aichatapp.controller;
 
 import com.aichatapp.model.BookRecord;
+import com.aichatapp.model.CountryCities;
 import com.aichatapp.service.BookStreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -135,6 +137,17 @@ public class ChatController {
                 .doOnSubscribe(s -> log.info("Stream started"))
                 .doOnComplete(() -> log.info("Stream completed"))
                 .doOnCancel(() -> log.info("Client disconnected, stream cancelled"));
+    }
+
+    @GetMapping("/gpt/structured-resp")
+    public ResponseEntity<CountryCities> getCountryCityList(@RequestParam("message") String message){
+        CountryCities countryCities = openAiChatClient
+                .prompt()
+                .user(message)
+                .call()
+                .entity(CountryCities.class);
+        return ResponseEntity.ok(countryCities);
+
     }
 
 }

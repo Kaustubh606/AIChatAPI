@@ -3,19 +3,8 @@ spring:
     name: openai
 
   ai:
-    chat:
-      client:
-        enabled: false
+  # ... jasa ahe tasa
 
-    openai:
-      api-key: ${OPENAI_API_KEY}
-      chat:
-        model: gpt-6-luna
-
-    ollama:
-      base-url: http://localhost:11434
-      chat:
-        model: qwen2.5:7b
   datasource:
     url: jdbc:oracle:thin:@//localhost:1521/XEPDB1
     username: ${DB_USER}
@@ -25,25 +14,11 @@ spring:
       maximum-pool-size: 10
       connection-timeout: 30000
 
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    show-sql: true
+    properties:
       hibernate:
-        ddl-auto: none          # table already exists; don't let Hibernate change it
-      open-in-view: false       # don't hold DB connections for the whole HTTP request
-      show-sql: true            # print SQL to the console (demo only)
-      properties:
-        hibernate:
-          format_sql: true
-
-
-logging:
-  pattern:
-    console: "%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %msg%n"
-  level:
-    org:
-      springframework:
-        ai:
-          chat:
-            client:
-              advisor: DEBUG
-
-
+        format_sql: true
