@@ -3,16 +3,31 @@ spring:
     name: aichatapi
 
   ai:
+    model:
+      embedding: openai                              # ← navin: fakt OpenAI cha embedding model
+
     openai:
+      base-url: http://localhost:12434/engines/v1    # ← chat madhun var halvla
+      api-key: dummy
       chat:
         model: ai/gemma3
-        base-url: http://localhost:12434/engines/v1
-      api-key: dummy
+      embedding:
+        options:
+          model: ai/mxbai-embed-large
+
     ollama:
       base-url: http://localhost:12434
       chat:
         options:
           model: ai/llama3.1
+
+    vectorstore:
+      qdrant:
+        initialize-schema: true
+        host: localhost
+        port: 6334
+        collection-name: eazybytes
+
 
   datasource:
     url: jdbc:oracle:thin:@//localhost:1521/XEPDB1
@@ -31,3 +46,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  docker:
+    compose:
+      stop:
+        command: down
