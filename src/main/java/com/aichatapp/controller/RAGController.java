@@ -25,12 +25,15 @@ public class RAGController {
     @Value("classpath:/sys-prompt-template/rag-sys-prompt-hrpolicy.st")
     private Resource hrSysTemplate;
     private final RetrievalAugmentationAdvisor ragAdvisor;
+    private final ChatClient webSearchChatClient;
 
     public RAGController(@Qualifier("chatMemoryChatClient") ChatClient chatClient, VectorStore vectoreStore,
-                         @Qualifier("retrievalAugmentationAdvisor")RetrievalAugmentationAdvisor ragAdvisor){
+                         @Qualifier("retrievalAugmentationAdvisor")RetrievalAugmentationAdvisor ragAdvisor,
+                         @Qualifier("webSearchRAGChatClient") ChatClient webSearchChatClient){
         this.chatClient = chatClient;
         this.vectoreStore = vectoreStore;
         this.ragAdvisor = ragAdvisor;
+        this.webSearchChatClient = webSearchChatClient;
     }
 
     //@GetMapping("/random-data/chat") - part of basic understading, now we are not using it
@@ -72,5 +75,15 @@ public class RAGController {
                 .content();
         return ResponseEntity.ok(llmResp);
 
+    }
+
+    @GetMapping("/web-search/chat")
+    public ResponseEntity<String> webSearchChat(@RequestParam("message") String message, @RequestHeader("username")String username){
+        String llmResp = webSearchChatClient.prompt()
+                .advisors(a->a.param(ChatMemory.CONVERSATION_ID,username))
+                .user(message)
+                .call()
+                .content();
+        return ResponseEntity.ok(llmResp);
     }
 }
