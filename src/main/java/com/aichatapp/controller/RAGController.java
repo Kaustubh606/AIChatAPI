@@ -1,0 +1,52 @@
+package com.aichatapp.controller;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/rag-api")
+public class RAGController {
+    private final ChatClient chatClient;
+    private final VectorStore vectoreStore;
+    @Value("classpath:/sys-prompt-template/rag-sys-prompt-random-data-example.st")
+    Resource randomDataTemplate;
+
+    public RAGController(@Qualifier("chatMemoryChatClient") ChatClient chatClient, VectorStore vectoreStore){
+        this.chatClient = chatClient;
+        this.vectoreStore = vectoreStore;
+    }
+
+    @GetMapping("/random-data/chat")
+    public ResponseEntity<String> randomDataChat(@RequestHeader("username") String username, @RequestParam("message") String message){
+        SearchRequest searchReq = SearchRequest.builder().query(message)
+                .topK(3)
+                .similarityThreshold(0.5)
+                //.filterExpression()TODO: need to check for current example
+                .build();
+        List<Document> similarDocs = vectoreStore.similaritySearch(searchReq);
+        String similarContext = similarDocs.stream()
+                .map(Document::getText)
+                .collect(Collectors.joining(System.lineSeparator()));
+
+        String llmResp = chatClient.prompt()
+                .system(promptSystemSpec -> promptSystemSpec.text(randomDataTemplate)
+                        .param("documents",similarContext))
+                .advisors(a->a.param(ChatMemory.CONVERSATION_ID,username))
+                .user(message)
+                .call()
+                .content();
+        return ResponseEntity.ok(llmResp);
+
+    }
+}

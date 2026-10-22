@@ -1,13 +1,16 @@
 spring:
   application:
     name: aichatapi
+  devtools:
+    restart:
+      enabled: false
 
   ai:
     model:
-      embedding: openai                              # ← navin: fakt OpenAI cha embedding model
+      embedding: openai
 
     openai:
-      base-url: http://localhost:12434/engines/v1    # ← chat madhun var halvla
+      base-url: http://localhost:12434/engines/v1
       api-key: dummy
       chat:
         model: ai/gemma3
