@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+//@Component - to turn off the post construct
 public class RandomeDataLoader {
     private final VectorStore vectorStore;
 

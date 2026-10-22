@@ -21,6 +21,8 @@ public class RAGController {
     private final VectorStore vectoreStore;
     @Value("classpath:/sys-prompt-template/rag-sys-prompt-random-data-example.st")
     Resource randomDataTemplate;
+    @Value("classpath:/sys-prompt-template/rag-sys-prompt-hrpolicy.st")
+    private Resource hrSysTemplate;
 
     public RAGController(@Qualifier("chatMemoryChatClient") ChatClient chatClient, VectorStore vectoreStore){
         this.chatClient = chatClient;
@@ -41,6 +43,23 @@ public class RAGController {
 
         String llmResp = chatClient.prompt()
                 .system(promptSystemSpec -> promptSystemSpec.text(randomDataTemplate)
+                        .param("documents",similarContext))
+                .advisors(a->a.param(ChatMemory.CONVERSATION_ID,username))
+                .user(message)
+                .call()
+                .content();
+        return ResponseEntity.ok(llmResp);
+    }
+
+    @GetMapping("/document/chat")
+    public ResponseEntity<String> documentChat(@RequestParam("message") String message, @RequestHeader("username") String username){
+        SearchRequest searchReq = SearchRequest.builder().query(message).topK(3).similarityThreshold(0.5).build();
+        List<Document> similarDocs = vectoreStore.similaritySearch(searchReq);
+
+        String similarContext = similarDocs.stream().map(Document::getText).collect(Collectors.joining(System.lineSeparator()));
+
+        String llmResp = chatClient.prompt()
+                .system(p->p.text(hrSysTemplate)
                         .param("documents",similarContext))
                 .advisors(a->a.param(ChatMemory.CONVERSATION_ID,username))
                 .user(message)
