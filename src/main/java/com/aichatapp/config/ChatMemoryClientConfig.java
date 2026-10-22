@@ -6,6 +6,9 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,14 +17,23 @@ import java.util.List;
 @Configuration
 public class ChatMemoryClientConfig {
     @Bean
-    public ChatClient chatMemoryChatClient(OpenAiChatModel openAiChatModel, ChatMemory chatMemory){
+    public ChatClient chatMemoryChatClient(OpenAiChatModel openAiChatModel, ChatMemory chatMemory,
+                                           RetrievalAugmentationAdvisor retrievalAugmentationAdvisor){
 
         Advisor advisorMemory = MessageChatMemoryAdvisor.builder(chatMemory).build();
         Advisor advisorLogger = new SimpleLoggerAdvisor();
         return ChatClient.builder(openAiChatModel)
                 .defaultAdvisors(List.of(
-                        new SimpleLoggerAdvisor(),
-                        MessageChatMemoryAdvisor.builder(chatMemory).build()))
+                        advisorLogger,
+                        advisorMemory))
+                .build();
+    }
+
+    @Bean
+    RetrievalAugmentationAdvisor retrievalAugmentationAdvisor(VectorStore vectorStore){
+        VectorStoreDocumentRetriever vecStoreDocRetriever = VectorStoreDocumentRetriever.builder().vectorStore(vectorStore).topK(3).similarityThreshold(0.5).build();
+        return RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(vecStoreDocRetriever)
                 .build();
     }
 }

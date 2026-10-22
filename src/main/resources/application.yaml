@@ -54,3 +54,7 @@ spring:
     compose:
       stop:
         command: down
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: DEBUG

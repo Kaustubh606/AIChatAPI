@@ -3,6 +3,7 @@ package com.aichatapp.controller;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,15 +24,18 @@ public class RAGController {
     Resource randomDataTemplate;
     @Value("classpath:/sys-prompt-template/rag-sys-prompt-hrpolicy.st")
     private Resource hrSysTemplate;
+    private final RetrievalAugmentationAdvisor ragAdvisor;
 
-    public RAGController(@Qualifier("chatMemoryChatClient") ChatClient chatClient, VectorStore vectoreStore){
+    public RAGController(@Qualifier("chatMemoryChatClient") ChatClient chatClient, VectorStore vectoreStore,
+                         @Qualifier("retrievalAugmentationAdvisor")RetrievalAugmentationAdvisor ragAdvisor){
         this.chatClient = chatClient;
         this.vectoreStore = vectoreStore;
+        this.ragAdvisor = ragAdvisor;
     }
 
-    @GetMapping("/random-data/chat")
+    //@GetMapping("/random-data/chat") - part of basic understading, now we are not using it
     public ResponseEntity<String> randomDataChat(@RequestHeader("username") String username, @RequestParam("message") String message){
-        SearchRequest searchReq = SearchRequest.builder().query(message)
+       /* SearchRequest searchReq = SearchRequest.builder().query(message)
                 .topK(3)
                 .similarityThreshold(0.5)
                 //.filterExpression()TODO: need to check for current example
@@ -39,11 +43,11 @@ public class RAGController {
         List<Document> similarDocs = vectoreStore.similaritySearch(searchReq);
         String similarContext = similarDocs.stream()
                 .map(Document::getText)
-                .collect(Collectors.joining(System.lineSeparator()));
+                .collect(Collectors.joining(System.lineSeparator()));*/
 
         String llmResp = chatClient.prompt()
-                .system(promptSystemSpec -> promptSystemSpec.text(randomDataTemplate)
-                        .param("documents",similarContext))
+                /*.system(promptSystemSpec -> promptSystemSpec.text(randomDataTemplate)
+                        .param("documents",similarContext))*/
                 .advisors(a->a.param(ChatMemory.CONVERSATION_ID,username))
                 .user(message)
                 .call()
@@ -53,14 +57,15 @@ public class RAGController {
 
     @GetMapping("/document/chat")
     public ResponseEntity<String> documentChat(@RequestParam("message") String message, @RequestHeader("username") String username){
-        SearchRequest searchReq = SearchRequest.builder().query(message).topK(3).similarityThreshold(0.5).build();
+        /*SearchRequest searchReq = SearchRequest.builder().query(message).topK(3).similarityThreshold(0.5).build();
         List<Document> similarDocs = vectoreStore.similaritySearch(searchReq);
 
         String similarContext = similarDocs.stream().map(Document::getText).collect(Collectors.joining(System.lineSeparator()));
-
+*/
         String llmResp = chatClient.prompt()
-                .system(p->p.text(hrSysTemplate)
-                        .param("documents",similarContext))
+                /*.system(p->p.text(hrSysTemplate)
+                        .param("documents",similarContext))*/
+                .advisors(ragAdvisor)
                 .advisors(a->a.param(ChatMemory.CONVERSATION_ID,username))
                 .user(message)
                 .call()
