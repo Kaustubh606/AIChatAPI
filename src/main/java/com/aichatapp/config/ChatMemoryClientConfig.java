@@ -1,5 +1,6 @@
 package com.aichatapp.config;
 
+import com.aichatapp.rag.PIIMaskingDocPostProcessor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -11,6 +12,7 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
+import org.springframework.ai.rag.postretrieval.document.DocumentPostProcessor;
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQueryTransformer;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
@@ -63,6 +65,7 @@ public class ChatMemoryClientConfig {
         return RetrievalAugmentationAdvisor.builder()
                 .queryTransformers(translator)
                 .documentRetriever(retriever)
+                .documentPostProcessors(new PIIMaskingDocPostProcessor())
                 .queryAugmenter(augmenter)
                 .build();
     }
