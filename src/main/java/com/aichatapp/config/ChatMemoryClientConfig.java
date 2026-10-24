@@ -1,6 +1,7 @@
 package com.aichatapp.config;
 
 import com.aichatapp.rag.PIIMaskingDocPostProcessor;
+import org.springframework.ai.chat.cache.semantic.SemanticCacheAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -29,14 +30,15 @@ import java.util.List;
 public class ChatMemoryClientConfig {
     @Bean
     public ChatClient chatMemoryChatClient(OpenAiChatModel openAiChatModel, ChatMemory chatMemory,
-                                           RetrievalAugmentationAdvisor retrievalAugmentationAdvisor){
+                                           SemanticCacheAdvisor semanticCacheAdvisor){
 
         Advisor advisorMemory = MessageChatMemoryAdvisor.builder(chatMemory).build();
         Advisor advisorLogger = new SimpleLoggerAdvisor();
         return ChatClient.builder(openAiChatModel)
                 .defaultAdvisors(List.of(
                         advisorLogger,
-                        advisorMemory))
+                        advisorMemory,
+                        semanticCacheAdvisor))
                 .build();
     }
 

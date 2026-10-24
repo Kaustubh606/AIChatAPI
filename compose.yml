@@ -5,3 +5,9 @@ services:
     ports:
       - "6333:6333"
       - "6334:6334"
+
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis_semantic_cache
+    ports:
+      - "6379:6379"
