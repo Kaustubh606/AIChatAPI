@@ -39,10 +39,10 @@
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-openai</artifactId>
 		</dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-ollama</artifactId>
-        </dependency>
+        </dependency>-->
         <!-- JPA + Hibernate + HikariCP connection pool -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -75,10 +75,15 @@
             <artifactId>ojdbc11</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!--  Redis cache      -->
+        <!--  Redis cache  spring use it for different DB caching even not using redis    -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-redis-semantic-cache</artifactId>
+        </dependency>
+        <!-- chat memory-->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
         </dependency>
 
        <!-- <dependency>

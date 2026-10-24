@@ -26,8 +26,7 @@ import java.time.Duration;
 public class ChatController {
     private static final Logger log = LoggerFactory.getLogger(ChatController.class);
     private final ChatClient openAiChatClient;
-    private final ChatClient ollamaChatClient;
-    private final ChatClient ollamaChatClientWithOptions;
+    private final ChatClient openAiChatClientWithOptions;
     @Autowired
     private BookStreamService bookService;
 
@@ -39,27 +38,21 @@ public class ChatController {
     @Value("classpath:/prompt-stuffing/resume-analysis-sys-prompt.st")
     Resource resumeAnalysisSysPrompt;
 
-    public ChatController(@Qualifier("openAiChatClient")ChatClient openAIChatClient, @Qualifier("ollamaChatClient")ChatClient ollamaChatClient
-    , @Qualifier("ollamaChatClientWithOptions")ChatClient ollamaChatClientWithOptions){
+    public ChatController(@Qualifier("openAiChatClient")ChatClient openAIChatClient,
+                          @Qualifier("openAiChatClientWithOptions")ChatClient openAiChatClientWithOptions){
         this.openAiChatClient = openAIChatClient;
-        this.ollamaChatClient = ollamaChatClient;
-        this.ollamaChatClientWithOptions = ollamaChatClientWithOptions;
+        this.openAiChatClientWithOptions = openAiChatClientWithOptions;
     }
 
 
-    @GetMapping("/gpt/chat")
-    public String callOpenAI(@RequestParam("message") String message) {
+    @GetMapping("/openai/chat")
+    public String callAiChat(@RequestParam("message") String message) {
         return openAiChatClient.prompt(message).call().content();
     }
 
-    @GetMapping("/ollama/chat")
-    public String callOllama(@RequestParam("message") String message) {
-        return ollamaChatClient.prompt(message).call().content();
-    }
-
-    @GetMapping("/ollama/hr-chat")
-    public String callOllamaHrChat(@RequestParam("message") String message) {
-        return ollamaChatClient.prompt()
+    @GetMapping("/openai/hr-chat")
+    public String callHrChat(@RequestParam("message") String message) {
+        return openAiChatClient.prompt()
                 .system(hrPoliciesSysPrompt)
                 .user(message)
                 //.advisors(new SimpleLoggerAdvisor())
@@ -68,9 +61,9 @@ public class ChatController {
                 .content();
     }
 
-    @GetMapping("/ollama/resume-chat")
-    public String callOllamaResumeAnalysisChat(@RequestParam("message") String message) {
-        return ollamaChatClient.prompt()
+    @GetMapping("/openai/resume-chat")
+    public String callResumeAnalysisChat(@RequestParam("message") String message) {
+        return openAiChatClient.prompt()
                 .system(resumeAnalysisSysPrompt)
                 .user(message)
                 //.advisors(new SimpleLoggerAdvisor())
@@ -79,9 +72,9 @@ public class ChatController {
                 .content();
     }
 
-    @GetMapping("/ollama/resume-chat-v2")
-    public String callOllamaResumeAnalysisChatWithOptions(@RequestParam("message") String message) {
-        return ollamaChatClientWithOptions.prompt()
+    @GetMapping("/openai/resume-chat-v2")
+    public String callResumeAnalysisChatWithOptions(@RequestParam("message") String message) {
+        return openAiChatClientWithOptions.prompt()
                 .system(resumeAnalysisSysPrompt)
                 .user(message)
                 //.advisors(new SimpleLoggerAdvisor())
@@ -90,9 +83,9 @@ public class ChatController {
                 .content();
     }
 
-    @GetMapping("/ollama/resume-stream-resp")
-    public Flux<String> callOllamaStreamResponse(@RequestParam("message") String message) {
-        return ollamaChatClient.prompt()
+    @GetMapping("/openai/resume-stream-resp")
+    public Flux<String> callStreamResponse(@RequestParam("message") String message) {
+        return openAiChatClient.prompt()
                 .system(resumeAnalysisSysPrompt)
                 .user(message)
                 .stream()
@@ -139,7 +132,7 @@ public class ChatController {
                 .doOnCancel(() -> log.info("Client disconnected, stream cancelled"));
     }
 
-    @GetMapping("/gpt/structured-resp")
+    @GetMapping("/openai/structured-resp")
     public ResponseEntity<CountryCities> getCountryCityList(@RequestParam("message") String message){
         CountryCities countryCities = openAiChatClient
                 .prompt()

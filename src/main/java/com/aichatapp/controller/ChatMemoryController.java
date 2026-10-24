@@ -6,10 +6,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -21,11 +18,11 @@ public class ChatMemoryController {
         this.chatMemoryClient = chatMemoryClient;
     }
 
-    @GetMapping("/gpt/chat-memory")
-    public ResponseEntity<String> chatWithMemory(@RequestParam("message") String message) {
+    @GetMapping("/openai/chat-memory")
+    public ResponseEntity<String> chatWithMemory(@RequestParam("message") String message, @RequestHeader String username) {
         return ResponseEntity.ok(chatMemoryClient.prompt()
                 .user(message)
-                        .advisors(advisorSpec ->advisorSpec.param(ChatMemory.CONVERSATION_ID,"default"))
+                        .advisors(advisorSpec ->advisorSpec.param(ChatMemory.CONVERSATION_ID,username))
                 .call()
                 .content());
     }

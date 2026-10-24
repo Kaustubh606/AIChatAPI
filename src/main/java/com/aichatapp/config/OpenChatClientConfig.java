@@ -14,11 +14,11 @@ import java.util.List;
 @Configuration
 public class OpenChatClientConfig {
     @Bean("openChatClient")
-    public ChatClient chatClient(OpenAiChatModel openAiChatModel, SemanticCacheAdvisor semanticCacheAdvisor){
-        return ChatClient.builder(openAiChatModel)
+    public ChatClient chatClient(ChatClient.Builder chatClientBuilder,
+                                 SemanticCacheAdvisor semanticCacheAdvisor) {
+        return chatClientBuilder
                 .defaultAdvisors(List.of(new SimpleLoggerAdvisor(),
-                        new TokenUsageAdvisor(),
-                        semanticCacheAdvisor))
+                        new TokenUsageAdvisor(), semanticCacheAdvisor))
                 .build();
     }
 }

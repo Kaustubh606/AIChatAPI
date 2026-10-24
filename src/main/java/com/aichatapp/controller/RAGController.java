@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/rag-api")
 public class RAGController {
     private final ChatClient chatClient;
-    private final VectorStore vectoreStore;
+    private final VectorStore vectorStore;
     @Value("classpath:/sys-prompt-template/rag-sys-prompt-random-data-example.st")
     Resource randomDataTemplate;
     @Value("classpath:/sys-prompt-template/rag-sys-prompt-hrpolicy.st")
@@ -27,11 +27,11 @@ public class RAGController {
     private final RetrievalAugmentationAdvisor ragAdvisor;
     private final ChatClient webSearchChatClient;
 
-    public RAGController(@Qualifier("chatMemoryChatClient") ChatClient chatClient, VectorStore vectoreStore,
+    public RAGController(@Qualifier("chatMemoryChatClient") ChatClient chatClient, VectorStore vectorStore,
                          @Qualifier("retrievalAugmentationAdvisor")RetrievalAugmentationAdvisor ragAdvisor,
                          @Qualifier("webSearchRAGChatClient") ChatClient webSearchChatClient){
         this.chatClient = chatClient;
-        this.vectoreStore = vectoreStore;
+        this.vectorStore = vectorStore;
         this.ragAdvisor = ragAdvisor;
         this.webSearchChatClient = webSearchChatClient;
     }

@@ -1,28 +1,23 @@
 spring:
   application:
     name: aichatapi
+
   devtools:
     restart:
       enabled: false
 
   ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+
     model:
       embedding: openai
 
-    openai:
-      base-url: http://localhost:12434/engines/v1
-      api-key: dummy
-      chat:
-        model: ai/gemma3
-      embedding:
-        options:
-          model: ai/mxbai-embed-large
-
-    ollama:
-      base-url: http://localhost:12434
-      chat:
-        options:
-          model: ai/llama3.1
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
 
     vectorstore:
       qdrant:
@@ -30,7 +25,6 @@ spring:
         host: localhost
         port: 6334
         collection-name: eazybytes
-
 
   datasource:
     url: jdbc:oracle:thin:@//localhost:1521/XEPDB1
