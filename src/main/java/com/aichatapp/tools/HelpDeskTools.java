@@ -35,7 +35,8 @@ public class HelpDeskTools {
         logger.info("Fetching support tickets for user: {}",username);
         List<HelpDeskTicket> tickets = service.getTicketByUsername(username);
         logger.info("Found {} ticket(s) for user: {}",tickets.size(),username);
-        //TODO: throw some exception if tickets fetching went wrong
+        //Exception Demo - it will be sent to LLM by default
+        //throw new RuntimeException("Unable to fetch ticket status.");
         return tickets;
     }
 
