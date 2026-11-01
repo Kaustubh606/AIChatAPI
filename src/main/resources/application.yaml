@@ -56,3 +56,17 @@ logging:
 test:
   relevancy:
     min-score: 0.7
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/traces
+  tracing:
+    sampling:
+      probability: 1.0
