@@ -52,3 +52,7 @@ spring:
 logging:
   level:
     org.springframework.ai.chat.client.advisor: DEBUG
+
+test:
+  relevancy:
+    min-score: 0.7
