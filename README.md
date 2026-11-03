@@ -1,6 +1,7 @@
 # AIChatAPI
 
 # AI Chat API — Spring AI Learning & Integration Project
+### *** IMP NOTE: Original author of the concept and structure of the code is eazybytes, I have modified it as and when required for my study purpose of AI related concepts learning. ***
 
 A Java/Spring Boot application demonstrating practical **Generative AI integration using Spring AI and OpenAI**.
 
